@@ -1,6 +1,6 @@
 use anchor_lang::prelude::*;
 
-declare_id!("PROGRAMID"); // replace with your program ID
+declare_id!("AEJgjbJf4GW67izumzv7hQotMQMihBaedyNQ9U898zG7");
 
 #[program]
 pub mod pqsdk {
@@ -32,34 +32,29 @@ pub mod pqsdk {
     }
 
     pub fn withdraw(ctx: Context<Withdraw>, amount: u64, secret_hash: [u8; 32]) -> Result<()> {
-        // verify commitment
+        // 1. Verify the commitment hash
         let provided_commitment = anchor_lang::solana_program::hash::hash(&secret_hash).to_bytes();
-
         require!(
             ctx.accounts.vault.dilithium_commitment == provided_commitment,
             PQSDKError::InvalidDilithiumHash
         );
 
-        // PDA signer seeds
-        let user_key = ctx.accounts.user_wallet.key();
-        let seeds = &[b"pqvault", user_key.as_ref(), &[ctx.accounts.vault.bump]];
-        let signer = &[&seeds[..]];
+        let vault_info = ctx.accounts.vault.to_account_info();
+        let user_info = ctx.accounts.user_wallet.to_account_info();
 
-        // transfer SOL from vault → user_wallet
-        let ix = anchor_lang::solana_program::system_instruction::transfer(
-            &ctx.accounts.vault.key(),
-            &ctx.accounts.user_wallet.key(),
-            amount,
+        // 2. Safety Check: Ensure the vault has enough SOL (including rent)
+        let rent_exempt_minimum = Rent::get()?.minimum_balance(vault_info.data_len());
+        let current_balance = vault_info.lamports();
+        
+        require!(
+            current_balance >= amount + rent_exempt_minimum,
+            PQSDKError::InsufficientFunds
         );
 
-        anchor_lang::solana_program::program::invoke_signed(
-            &ix,
-            &[
-                ctx.accounts.vault.to_account_info(),
-                ctx.accounts.user_wallet.to_account_info(),
-            ],
-            signer,
-        )?;
+        // 3. THE FIX: Direct Lamport Adjustment
+        // We bypass the System Program to avoid the "from must not carry data" error
+        **vault_info.try_borrow_mut_lamports()? -= amount;
+        **user_info.try_borrow_mut_lamports()? += amount;
 
         Ok(())
     }
@@ -75,10 +70,8 @@ pub struct InitVault<'info> {
         bump
     )]
     pub vault: Account<'info, VaultAccount>,
-
     #[account(mut)]
     pub user: Signer<'info>,
-
     pub system_program: Program<'info, System>,
 }
 
@@ -90,10 +83,8 @@ pub struct Deposit<'info> {
         bump = vault.bump
     )]
     pub vault: Account<'info, VaultAccount>,
-
     #[account(mut)]
     pub user: Signer<'info>,
-
     pub system_program: Program<'info, System>,
 }
 
@@ -105,11 +96,8 @@ pub struct Withdraw<'info> {
         bump = vault.bump
     )]
     pub vault: Account<'info, VaultAccount>,
-
-    /// CHECK: recipient of funds
-    #[account(mut)]
+    #[account(mut)] // Must be mut to receive lamports
     pub user_wallet: AccountInfo<'info>,
-
     pub system_program: Program<'info, System>,
 }
 
@@ -123,4 +111,6 @@ pub struct VaultAccount {
 pub enum PQSDKError {
     #[msg("Invalid Dilithium hash")]
     InvalidDilithiumHash,
+    #[msg("Insufficient funds in vault to maintain rent exemption")]
+    InsufficientFunds,
 }
