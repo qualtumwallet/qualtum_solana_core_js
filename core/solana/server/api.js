@@ -9,7 +9,7 @@ import {
 import idl from "./idl.json";
 import base58 from "bs58";
 
-const PROGRAM_ID = new PublicKey("PID");
+const PROGRAM_ID = new PublicKey("AEJgjbJf4GW67izumzv7hQotMQMihBaedyNQ9U898zG7");
 
 async function getProgram(keypair) {
   try {
