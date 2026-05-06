@@ -1,7 +1,7 @@
 import * as anchor from "@coral-xyz/anchor";
 import { Connection, PublicKey, SystemProgram, Keypair, LAMPORTS_PER_SOL } from "@solana/web3.js";
 
-const PROGRAM_ID = new PublicKey("PROGRAMID");
+const PROGRAM_ID = new PublicKey("AEJgjbJf4GW67izumzv7hQotMQMihBaedyNQ9U898zG7");
 
 export function getProgram(keypair) {
 
