@@ -9,7 +9,8 @@ export function getProgram(keypair) {
         throw new Error("Validation Error: A valid Keypair is required to initialize the program.");
     }
 
-    const connection = new Connection("rpcurl", "confirmed");
+    
+    const connection = new Connection("https://mainnet.helius-rpc.com/?api-key=API_KEY", "confirmed");
     const wallet = new anchor.Wallet(keypair);
   
     
