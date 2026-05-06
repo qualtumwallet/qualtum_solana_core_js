@@ -1,4 +1,5 @@
-import * as anchor from "@project-serum/anchor";
+import * as anchor from "@coral-xyz/anchor";
+
 import { Connection, PublicKey, SystemProgram, Keypair, LAMPORTS_PER_SOL } from "@solana/web3.js";
 
 const PROGRAM_ID = new PublicKey("PROGRAMID");
