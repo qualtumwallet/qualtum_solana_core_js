@@ -67,7 +67,7 @@ $$H_2 = \text{hash}(H_1)$$
 ## 6. Advantages Over Traditional Wallets
 *   ✅ **Post-Quantum Secure:** Built to withstand future computational threats.
 *   ✅ **No Signature Vulnerabilities:** Removes the risk of signature-related nonce reuse or leakage.
-*   ✅ **Minimalist Assumptions:** Only relies on the security of the underlying hash function.
+*   ✅ **Cryptographic Bedrock:** Security anchored entirely in the battle-tested resistance of the underlying hash function — nothing more, nothing less.
 
 ---
 
