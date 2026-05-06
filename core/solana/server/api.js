@@ -14,7 +14,7 @@ const PROGRAM_ID = new PublicKey("PID");
 async function getProgram(keypair) {
   try {
     const connection = new Connection(
-      "https://api.mainnet.solana.com",
+      "https://mainnet.helius-rpc.com/?api-key=API_KEY",
       "confirmed"
     );
 
