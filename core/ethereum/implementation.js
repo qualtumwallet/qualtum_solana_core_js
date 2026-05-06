@@ -1,7 +1,7 @@
 import { ethers } from "ethers";
 import ABI from "./abi.json"
 
-const CONTRACT_ADDRESS = "AddressHere";
+const CONTRACT_ADDRESS = "CONTRACTADDRESS";
 
 
 
